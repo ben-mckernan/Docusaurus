@@ -5,12 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+
 const hljs = require('highlight.js');
 const Markdown = require('remarkable');
+const ReactRenderer = require('remarkable-react').default;
 const prismjs = require('prismjs');
 const deepmerge = require('deepmerge');
 const chalk = require('chalk');
 const anchors = require('./anchors.js');
+const reactComponent = require('./react-component.js')
 
 const CWD = process.cwd();
 
@@ -59,7 +62,7 @@ class MarkdownRenderer {
                     `Warning: ${chalk.red(
                       language,
                     )} is not supported by prismjs.` +
-                      '\nPlease refer to https://prismjs.com/#languages-list for the list of supported languages.',
+                    '\nPlease refer to https://prismjs.com/#languages-list for the list of supported languages.',
                   );
                   console.log(unsupportedLanguageError);
                 } else console.error(err);
@@ -95,9 +98,21 @@ class MarkdownRenderer {
     }
 
     const md = new Markdown(markdownOptions);
-
-    // Register anchors plugin
-    md.use(anchors);
+    md.renderer = new ReactRenderer({
+      components: {
+        react: reactComponent(siteConfig.reactComponents || {}),
+        anchor: anchors
+      },
+      tokens: {
+        fence: ({ params }) => {
+          if (params === 'react') {
+            return 'react';
+          }
+          return ['pre', 'code']
+        },
+        heading_open: ({ hLevel }) => [`h${hLevel}`, 'anchor']
+      }
+    });
 
     // Allow client sites to register their own plugins
     if (siteConfig.markdownPlugins) {
@@ -109,15 +124,11 @@ class MarkdownRenderer {
     this.md = md;
   }
 
-  toHtml(source) {
-    const html = this.md.render(source);
-
-    // Ensure fenced code blocks use Highlight.js hljs class
-    // https://github.com/jonschlinkert/remarkable/issues/224
-    return html.replace(/<pre><code>/g, '<pre><code class="hljs">');
+  render(source) {
+    return this.md.render(source);
   }
 }
 
 const renderMarkdown = new MarkdownRenderer();
 
-module.exports = source => renderMarkdown.toHtml(source);
+module.exports = source => renderMarkdown.render(source);

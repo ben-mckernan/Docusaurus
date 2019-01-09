@@ -1,5 +1,5 @@
 {
-  "name": "docusaurus",
+  "name": "@episerver/docusaurus",
   "description": "Easy to Maintain Open Source Documentation Websites",
   "version": "1.7.2",
   "license": "MIT",
@@ -81,6 +81,7 @@
     "react-dev-utils": "^5.0.2",
     "react-dom": "^16.5.0",
     "remarkable": "^1.7.1",
+    "remarkable-react": "^1.4.1",
     "request": "^2.87.0",
     "shelljs": "^0.7.8",
     "sitemap": "^1.13.0",

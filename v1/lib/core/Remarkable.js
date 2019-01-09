@@ -11,20 +11,12 @@ const renderMarkdown = require('./renderMarkdown.js');
 class Remarkable extends React.Component {
   content() {
     if (this.props.source) {
-      return (
-        <span
-          dangerouslySetInnerHTML={{
-            __html: renderMarkdown(this.props.source),
-          }}
-        />
-      );
+      return renderMarkdown(this.props.source);
     }
 
     return React.Children.map(this.props.children, child => {
       if (typeof child === 'string') {
-        return (
-          <span dangerouslySetInnerHTML={{__html: renderMarkdown(child)}} />
-        );
+        return renderMarkdown(child);
       }
 
       return child;
